@@ -1,0 +1,1 @@
+squire: python squire.py
