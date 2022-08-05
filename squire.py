@@ -1,14 +1,19 @@
 import telebot
 import os
-import random
+import re
+from DiceParser import DiceParser
+from DiceParser import DICE_DELIMETERS
 
 TOKEN = os.getenv('BOT_TOKEN')
 bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(content_types=['text'])
-def bruh_handler(message):
-    if message.from_user.username == 'ExAnimoso':
-        bot.send_message(message.chat.id, message.text + ' ' + str(random.randint(1, 20)))
-    else:
-        bot.send_message(message.chat.id, 'Возьми д20 в руки и брось на стол. Сообщи чату результат на верхней грани.')
+def dice_handler(message):
+    try:
+        if (re.match('^/[0-9]*' + DICE_DELIMETERS, message.text)):
+            dp = DiceParser()
+            dp.parse(message.text[1:])
+            bot.reply_to(message, dp.getDescription())
+    except:
+        pass
 bot.polling()
