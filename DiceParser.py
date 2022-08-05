@@ -38,10 +38,14 @@ class DiceExpression:
       self.positive = positive
 
       diceValues = re.split(DICE_DELIMETERS, value)
+      if (len(diceValues) != 2):
+        raise Exception
       if diceValues[0] == '':
         diceValues[0] = 1
       if diceValues[1] == '':
         diceValues[1] = 20
+      if (int(diceValues[0]) > 1000 or int(diceValues[1]) > 1000):
+        raise Exception
       for x in range(0, int(diceValues[0])):
         currentRoll = random.randint(1, int(diceValues[1]))
         self.calculated.append(currentRoll)
@@ -58,6 +62,8 @@ class FlatExpression:
     def __init__(self, value):
         self.value = int(value)
         self.string = value
+        if (self.value > 1000):
+            raise Exception
 
     def getValue(self):
         return self.value
