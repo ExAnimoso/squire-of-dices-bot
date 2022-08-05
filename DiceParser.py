@@ -52,7 +52,7 @@ class DiceExpression:
         self.total += currentRoll
 
     def getValue(self):
-        return self.total
+        return self.total if self.positive else -self.total
 
     def getDescription(self):
         return ('+' if self.positive else '-') + self.original + '(' + ",".join(map(str, self.calculated)) + ')'
