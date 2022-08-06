@@ -37,11 +37,13 @@ class DiceExpression:
         self.calculated = []
         self.positive = positive
         self.mode = 'STR'
+        self.dTwentyMode = False
 
         diceValues = re.split(DICE_DELIMETERS, value)
         if len(diceValues) != 2:
             raise Exception
         if re.search('^1?[dDкК](20)?[!#]?$', value):
+            self.dTwentyMode = True
             diceValues[0] = '1'
             diceValues[1] = '20'
             if value.endswith('!'):
@@ -69,7 +71,13 @@ class DiceExpression:
         return self.total if self.positive else -self.total
 
     def getDescription(self):
-        return ('+' if self.positive else '-') + self.original + '(' + ",".join(map(str, self.calculated)) + ')'
+        critIndicator = ''
+        if self.dTwentyMode:
+            if self.getValue() == 1:
+                critIndicator = '☠️'
+            if self.getValue() == 20:
+                critIndicator = '🔥'
+        return ('+' if self.positive else '-') + self.original + '(' + ",".join(map(str, self.calculated)) + ')' + critIndicator
 
 
 class FlatExpression:
