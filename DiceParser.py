@@ -32,26 +32,40 @@ class DiceParser:
 
 class DiceExpression:
     def __init__(self, value, positive):
-      self.total=0
-      self.original = value
-      self.calculated = []
-      self.positive = positive
+        self.total=0
+        self.original = value
+        self.calculated = []
+        self.positive = positive
+        self.mode = 'STR'
 
-      diceValues = re.split(DICE_DELIMETERS, value)
-      if (len(diceValues) != 2):
-        raise Exception
-      if diceValues[0] == '':
-        diceValues[0] = 1
-      if diceValues[1] == '':
-        diceValues[1] = 20
-      if (int(diceValues[0]) > 1000 or int(diceValues[1]) > 1000):
-        raise Exception
-      for x in range(0, int(diceValues[0])):
-        currentRoll = random.randint(1, int(diceValues[1]))
-        self.calculated.append(currentRoll)
-        self.total += currentRoll
+        diceValues = re.split(DICE_DELIMETERS, value)
+        if len(diceValues) != 2:
+            raise Exception
+        if re.search('^1?[dDкК](20)?[!#]?$', value):
+            diceValues[0] = '1'
+            diceValues[1] = '20'
+            if value.endswith('!'):
+                diceValues[0] = '2'
+                self.mode = 'ADV'
+            if value.endswith('#'):
+                diceValues[0] = '2'
+                self.mode = 'DIS'
+        if diceValues[0] == '':
+            diceValues[0] = '1'
+        if diceValues[1] == '':
+            diceValues[1] = '20'
+        if (int(diceValues[0]) > 1000 or int(diceValues[1]) > 1000):
+            raise Exception
+        for x in range(0, int(diceValues[0])):
+            currentRoll = random.randint(1, int(diceValues[1]))
+            self.calculated.append(currentRoll)
+            self.total += currentRoll
 
     def getValue(self):
+        if self.mode == 'ADV':
+            return max(self.calculated[0], self.calculated[1])
+        if self.mode == 'DIS':
+            return min(self.calculated[0], self.calculated[1])
         return self.total if self.positive else -self.total
 
     def getDescription(self):
